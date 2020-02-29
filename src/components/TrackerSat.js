@@ -70,8 +70,7 @@ class TrackSat extends Component {
   // Getting TLE data from the API with axios
   getTLE() {
     const { satId } = this.state;
-    const url = `${config.N2YO_TLE_URL}${satId}&apiKey=${process.env
-      .REACT_APP_API_KEY || process.env.GATSBY_API_KEY}`;
+    const url = `${config.N2YO_TLE_URL}${satId}&apiKey=${process.env.REACT_APP_API_KEY}`;
     axios
       .get(url)
       .then((resp) =>
