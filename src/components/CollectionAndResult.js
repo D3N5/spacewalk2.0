@@ -21,9 +21,9 @@ import hubble from './images/hubbleCollection.png';
 import exoplanet from './images/exoplanetCollection.jpeg';
 
 const override = css`
-    display: block;
-    margin: 0 auto;
-    border-color: red;
+  display: block;
+  margin: 0 auto;
+  border-color: red;
 `;
 
 class CollectionAndResult extends Component {
@@ -49,11 +49,11 @@ class CollectionAndResult extends Component {
         {
           name: 'exoplanet',
           url: exoplanet,
-        }
+        },
       ],
       currentPage: 1,
       articlesPerPage: 6,
-      isFiltered: true
+      isFiltered: true,
     };
 
     // Binding methods
@@ -63,14 +63,17 @@ class CollectionAndResult extends Component {
   }
 
   componentDidMount() {
-    fetch('https://hubblesite.wild31.com/api/v3/external_feed/esa_feed?page=all', {
-      crossDomain: true
-    })
-      .then(response => response.json())
-      .then(data => {
+    fetch(
+      'https://cors-anywhere.herokuapp.com/http://hubblesite.org/api/v3/external_feed/esa_feed?page=all',
+      {
+        crossDomain: true,
+      },
+    )
+      .then((response) => response.json())
+      .then((data) => {
         this.setState({
           article: data,
-          loading: false
+          loading: false,
         });
       });
   }
@@ -79,7 +82,7 @@ class CollectionAndResult extends Component {
     this.setState({
       tagName: tag,
       currentPage: 1,
-      isFiltered: true
+      isFiltered: true,
     });
   }
 
@@ -88,9 +91,9 @@ class CollectionAndResult extends Component {
   }
 
   handleResetFilter() {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       isFiltered: !prevState.isFiltered,
-      currentPage: 1
+      currentPage: 1,
     }));
   }
 
@@ -103,14 +106,13 @@ class CollectionAndResult extends Component {
       tagName,
       tag,
       isFiltered,
-      loading
+      loading,
     } = this.state;
 
     // Woking with filtered articles in order to display a reliable number of pages
-    let filteredArticles = article
-      .filter(
-        singleArt => tagName === '' || singleArt.title.includes(tagName)
-      );
+    let filteredArticles = article.filter(
+      (singleArt) => tagName === '' || singleArt.title.includes(tagName),
+    );
     // Working with all articles when reset filter
     if (!isFiltered) {
       filteredArticles = article;
@@ -119,16 +121,23 @@ class CollectionAndResult extends Component {
     // Logic for displaying articles
     const indexOfLastArticle = currentPage * articlesPerPage;
     const indexOfFirstArticle = indexOfLastArticle - articlesPerPage;
-    const currentArticles = filteredArticles.slice(indexOfFirstArticle, indexOfLastArticle);
+    const currentArticles = filteredArticles.slice(
+      indexOfFirstArticle,
+      indexOfLastArticle,
+    );
 
     // Logic for displaying page numbers
     const pageNumbers = [];
-    for (let i = 1; i <= Math.ceil(filteredArticles.length / articlesPerPage); i += 1) {
+    for (
+      let i = 1;
+      i <= Math.ceil(filteredArticles.length / articlesPerPage);
+      i += 1
+    ) {
       pageNumbers.push(i);
     }
 
     // Display pages
-    const renderPageNumbers = pageNumbers.map(number => (
+    const renderPageNumbers = pageNumbers.map((number) => (
       <li
         className={`paginate-page ${number === currentPage ? 'active' : ''}`}
         key={number}
@@ -163,7 +172,6 @@ class CollectionAndResult extends Component {
         <div className="container-fluid mx-auto bg-gradient" id="resultsHubble">
           <div id="collections">
             {tag.map((singleTag, index) => (
-
               <Collections
                 key={singleTag}
                 url={singleTag.url}
@@ -171,27 +179,24 @@ class CollectionAndResult extends Component {
                 handleTag={this.handleTag}
                 i={index}
               />
-
             ))}
           </div>
 
           <div className="row mx-auto">
             {currentArticles.map((singleArt) => (
-
               <div
                 key={singleArt.pub_date}
                 className="articleHome articleHome-bg-light pr-3"
               >
                 <Link to={`/hubble/${singleArt.pub_date}`}>
-                  <img
-                    src={singleArt.image}
-                    alt={singleArt.title}
-                  />
+                  <img src={singleArt.image} alt={singleArt.title} />
                 </Link>
                 <div>
                   {tag
-                    .filter(SingleTag => singleArt.title.includes(SingleTag.name))
-                    .map(SingleTag => (
+                    .filter((SingleTag) =>
+                      singleArt.title.includes(SingleTag.name),
+                    )
+                    .map((SingleTag) => (
                       <p
                         style={{
                           backgroundColor: colorTag(SingleTag.name),
@@ -205,26 +210,19 @@ class CollectionAndResult extends Component {
                         {SingleTag.name}
                       </p>
                     ))}
-                  <p className="date">
-                    {excerptDate(singleArt.pub_date)}
-                  </p>
+                  <p className="date">{excerptDate(singleArt.pub_date)}</p>
 
                   <h2>{singleArt.title}</h2>
                   {/* <p>
                       {excerpt(singleArt.description, 10)}
                     </p> */}
                   <Link to={`/hubble/${singleArt.pub_date}`}>
-                    <Button
-                      color="dark"
-                      className="btn-sm"
-                      outline
-                    >
+                    <Button color="dark" className="btn-sm" outline>
                       Read more ⇢
                     </Button>
                   </Link>
                 </div>
               </div>
-
             ))}
           </div>
         </div>
@@ -232,10 +230,7 @@ class CollectionAndResult extends Component {
           <ul className="paginate-container">
             <span className="paginate-text">Page :</span>
             {renderPageNumbers}
-            <li
-              className="paginate-reset"
-              onClick={this.handleResetFilter}
-            >
+            <li className="paginate-reset" onClick={this.handleResetFilter}>
               Display all
             </li>
           </ul>
