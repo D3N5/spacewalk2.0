@@ -7,7 +7,6 @@ import '../../node_modules/noty/lib/themes/sunset.css';
 import { css } from '@emotion/core';
 import { PropagateLoader } from 'react-spinners';
 import config from '../config';
-import keys from '../keys';
 import MapComp from './tracking/MapComp';
 import SatDataComp from './tracking/SatDataComp';
 import SatDescripComp from './tracking/SatDescripComp';
@@ -18,9 +17,9 @@ import './tracking/trackerSat.css';
 import Title from './title';
 
 const override = css`
-    display: block;
-    margin: 0 auto;
-    border-color: red;
+  display: block;
+  margin: 0 auto;
+  border-color: red;
 `;
 
 // Initializing library TLE.js
@@ -44,7 +43,8 @@ class TrackSat extends Component {
       satDescrip: [sat[0].description],
       satLaunchDate: [sat[0].launch],
       mapCenter: [43.604, 1.444],
-      tle: '1 25544U 98067A   19120.40833581  .00001450  00000-0  30616-4 0  9995\r\n2 25544  51.6410 238.6747 0000873 256.1238 216.5201 15.52607716167833',
+      tle:
+        '1 25544U 98067A   19120.40833581  .00001450  00000-0  30616-4 0  9995\r\n2 25544  51.6410 238.6747 0000873 256.1238 216.5201 15.52607716167833',
       coords: { lat: '', lng: '' },
     };
     // Binding methods
@@ -70,14 +70,20 @@ class TrackSat extends Component {
   // Getting TLE data from the API with axios
   getTLE() {
     const { satId } = this.state;
-    const url = `${config.N2YO_TLE_URL}${satId}&apiKey=${keys.N2YO_API_KEY}`;
-    axios.get(url)
-      .then(resp => this.setState({
-        hits: resp.data,
-        tle: resp.data.tle,
-        isLoading: false,
-      }, this.getCurrentCoords))
-      .catch(error => this.setState({ error, isLoading: false }));
+    const url = `${config.N2YO_TLE_URL}${satId}&apiKey=${process.env.REACT_APP_API_KEY}`;
+    axios
+      .get(url)
+      .then((resp) =>
+        this.setState(
+          {
+            hits: resp.data,
+            tle: resp.data.tle,
+            isLoading: false,
+          },
+          this.getCurrentCoords,
+        ),
+      )
+      .catch((error) => this.setState({ error, isLoading: false }));
   }
 
   // Getting satellite latitude & longitude from TLE.js
@@ -103,7 +109,7 @@ class TrackSat extends Component {
       iconUrl: require('./images/satellite.png'),
       iconSize: [60, 60],
     });
-    const marker = (satId[0] === 25544) ? issMarker : satMarker;
+    const marker = satId[0] === 25544 ? issMarker : satMarker;
     return marker;
   }
 
@@ -133,7 +139,11 @@ class TrackSat extends Component {
     // const threeOrbitsArr = tlejs.getGroundTrackLngLat(tle);
     // const currentOrbitArr = threeOrbitsArr[1];
     // const { currentOrbitCoords } = this.state;
-    const geometry = { ...geoData.features[0].geometry, type: 'LineString', coordinates: this.getCurrentOrbitCoords() };
+    const geometry = {
+      ...geoData.features[0].geometry,
+      type: 'LineString',
+      coordinates: this.getCurrentOrbitCoords(),
+    };
     const typePropsGeometry = [{ ...geoData.features[0], geometry: geometry }];
     const features = { ...geoData, features: typePropsGeometry };
     return features;
@@ -147,7 +157,10 @@ class TrackSat extends Component {
     // this.getCurrentCoords();
     // this.getCurrentOrbitCoords();
     // this.buildGeoJson();
-    setTimeout(() => this.setState({ mapCenter: [coords.lat, coords.lng] }), 800);
+    setTimeout(
+      () => this.setState({ mapCenter: [coords.lat, coords.lng] }),
+      800,
+    );
   }
 
   // Handling change of select input form
@@ -164,29 +177,29 @@ class TrackSat extends Component {
       theme: 'sunset',
       type: 'info',
       text: `You're tracking ${satNameVal}`,
-      timeout: 2000
+      timeout: 2000,
     }).show();
     // Extracting the satellite id from the name value store in the state
     const idMatched = jsonSatList
-      .filter(item => (item.name === satNameVal))
-      .map(singleItem => (singleItem.id));
+      .filter((item) => item.name === satNameVal)
+      .map((singleItem) => singleItem.id);
     // Extracting the satellite description from the name value store in the state
     const descriptionMatched = jsonSatList
-      .filter(item => (item.name === satNameVal))
-      .map(singleItem => (singleItem.description));
+      .filter((item) => item.name === satNameVal)
+      .map((singleItem) => singleItem.description);
     // Extracting the satellite launch date from the name value store in the state
     const dateMatched = jsonSatList
-      .filter(item => (item.name === satNameVal))
-      .map(singleItem => (singleItem.launch));
+      .filter((item) => item.name === satNameVal)
+      .map((singleItem) => singleItem.launch);
 
     // Updating State with satellite id, description and launch date
     this.setState(
       {
         satId: idMatched,
         satDescrip: descriptionMatched,
-        satLaunchDate: dateMatched
+        satLaunchDate: dateMatched,
       },
-      this.getMethods
+      this.getMethods,
     );
   }
 
@@ -203,13 +216,15 @@ class TrackSat extends Component {
       satDescrip,
       satLaunchDate,
       mapCenter,
-      coords
+      coords,
     } = this.state;
     const uniqueKey = Date.now();
 
     // Console logging of the number of transcations with the API
     if (hits) {
-      console.log(`Count of transactions performed in last 60 min : ${hits.info.transactionscount}`);
+      console.log(
+        `Count of transactions performed in last 60 min : ${hits.info.transactionscount}`,
+      );
     }
 
     // Displaying error message if any
@@ -236,12 +251,18 @@ class TrackSat extends Component {
     }
 
     // Making the option tag list for form select input
-    const satList = jsonSatList
-      .map(item => <option key={item.id} value={item.name}>{item.name}</option>);
+    const satList = jsonSatList.map((item) => (
+      <option key={item.id} value={item.name}>
+        {item.name}
+      </option>
+    ));
 
     return (
       <div className="container-fluid text-center tracker-page">
-        <Title title="Space &amp; Earth science satellites tracking" idStyle="titlelight" />
+        <Title
+          title="Space &amp; Earth science satellites tracking"
+          idStyle="titlelight"
+        />
         <div className="containerStyle">
           <div className="mapLoc">
             <MapComp
