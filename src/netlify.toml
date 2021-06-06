@@ -1,0 +1,4 @@
+[[headers]]
+  for = "/api.n2yo.com/*"
+  [headers.values]
+  Access-Control-Allow-Origin = "*"
